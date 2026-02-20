@@ -1,6 +1,6 @@
 use chrono::prelude::*;
 use crossterm::{
-    ExecutableCommand, QueueableCommand,
+    ExecutableCommand, execute,
     cursor::{self, MoveTo},
     style::{self, Print},
     terminal::{self, WindowSize, disable_raw_mode, enable_raw_mode, size, window_size},
@@ -12,7 +12,7 @@ use std::{
 };
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    enable_raw_mode()?;
+    //enable_raw_mode()?;
 
     let mut stdout = io::stdout();
 
@@ -22,12 +22,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         print!("\x1B[2J\x1B[H");
         io::stdout().flush().unwrap();
 
-        let now_local: DateTime<Local> = Local::now();
-        println!("{} ", now_local.format("%H:%M:%S"));
-
         let curr_window_size: WindowSize = window_size()?;
 
-        println!("{}", curr_window_size.rows);
+        let now_local: DateTime<Local> = Local::now();
+        
+        execute!(
+            io::stdout(),
+            MoveTo(curr_window_size.columns/2 -3, curr_window_size.rows/2 )
+        );
+
+        println!("{} ", now_local.format("%H:%M:%S"));
+
+
+        //println!("{}", curr_window_size.rows);
+        //println!("{}", curr_window_size.columns);
 
         let next_minute_start = now_local
             .with_second(0)
